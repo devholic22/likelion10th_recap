@@ -1,69 +1,40 @@
-import User from "../../models/User";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { passwordHash } from "../../middlewares";
+import { User } from "../../models";
 
-export const getRegister = (req, res) => {
-    return res.status(200).send("회원가입 등록 페이지");
-}
+export const getAllUser = async (req, res) => {
+    const users = await User.findAll({});
+    return res.json(users);
+};
 
-export const postRegister = async (req, res) => {
-    const {email, username, password} = req.body;
-    if(!email || !username || !password){
-        return res.status(400).json({
-            error: "정상적인 요청이 아닙니다."
-    });
-    }
-    const isEmailExist = await User.findOne({
-        where: {email}
-    })
-    if(isEmailExist){
-        return res.status(400).json({
-            error: "Email already exist"
+export const getUser = async (req, res) => {
+    const {name} = req.params;
+    if(!name){
+        return res.json({
+            "error" : "잘못된 요청"
         })
     }
-    await User.create({
-        email,
-        username,
-        password: await passwordHash(password)
-    });
-    return res.status(200).send("회원가입 완료");
-}
-
-export const getLogin = (req, res) => {
-    return res.status(200).send("로그인 페이지");
-}
-
-export const postLogin = async (req, res) => {
-    const {email, password} = req.body;
-    if(!email || !password){
-        return res.status(400).json("정상적인 요청이 아닙니다.");
-    }
-    const existUser = await User.findOne({
-        where: {email}
-    });
-    if(existUser){
-        const isPasswordCorrect = bcrypt.compareSync(String(password), existUser.password);
-        if(isPasswordCorrect){
-            const token = jwt.sign(
-                {
-                    id: existUser.id
-                },
-                process.env.JWT_SECRET,
-                {
-                    expiresIn: "5m",
-                    issuer: "likelion"
-                }
-            );
-            return res.status(200).json({
-                code: 200,
-                message: "토큰이 발급되었습니다",
-                token
-            });
-        }
-        return res.status(400).json({error: "비밀번호가 일치하지 않습니다."});
-    }
-    return res.status(400).json({
-        error: "등록되지 않은 이메일입니다."
+    const user = await User.findOne({
+        where: {name: name}
     })
+    if(!user){
+        res.json({
+            "error" : "해당 유저가 없습니다."
+        })
+    }
+    return res.json(user);
 }
+export const makeUser = async (req, res) => {
+    const {name, position, email, github, insta, likelion, phone} = req.body;
+    /*
+    if(!name || !position || !email || !github || !insta || !likelion || !phone){
+        return res.json({
+            "error" : "잘못된 요청"
+        })
+    };
+    */
+    const newUser = await User.create({
+        name, position, email, github, insta, likelion, phone
+    });
+    const allUser = await User.findAll({});
+
+    return res.json(allUser);
+};

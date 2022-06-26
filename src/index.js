@@ -1,20 +1,10 @@
 import express from "express";
-import { sequelize } from "../models";
-import jwt from "jsonwebtoken";
-import { config } from "dotenv";
-import verifyToken from "../middlewares";
+import { sequelize, User } from "../models";
 import globalRouter from "./router/globalRouter";
-import userRouter from "./router/userRouter";
-import postRouter from "./router/postRouter";
-import swaggerOptions from "./swagger";
-import swaggerJSDoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
+import cors from "cors";
 
 const app = express();
 const port = 3000;
-const specs = swaggerJSDoc(swaggerOptions);
-
-config();
 
 sequelize
   .sync({ force: false }) // false로 해야 데이터 손실 방지
@@ -27,11 +17,47 @@ sequelize
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+// app.use(cors({
+//   origin : "*",
+//   credentials: true
+// }));
+
+var corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  //credentials: 'true'
+}
+
+app.use(cors(corsOptions));
+
 
 app.use("/", globalRouter);
-app.use("/user", userRouter);
-app.use("/post", postRouter);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs, {explorer: true}));
+
+app.get("/position/:position", async (req, res) => {
+  const { position } = req.params;
+  const sortedUser = [];
+  const allUser = await User.findAll({});
+  allUser.forEach(user => {
+    const positions = user.position.split(", ");
+    if(positions.includes(position)){
+      sortedUser.push(user);
+    }
+  })
+  return res.json(sortedUser);
+});
+
+app.get("/likelion/:lion", async (req, res) => {
+  const { lion } = req.params;
+  const sortedUser = [];
+  const allUser = await User.findAll({});
+  allUser.forEach(user => {
+    const lions = user.likelion.split(", ");
+    if(lions.includes(lion)){
+      sortedUser.push(user);
+    }
+  })
+  return res.json(sortedUser);
+})
 
 app.listen(port, () => {
   console.log(__dirname);

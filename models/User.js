@@ -3,14 +3,26 @@ const Sequelize = require('sequelize');
 module.exports = class User extends Sequelize.Model{
     static init(sequelize){ // 테이블에 대한 설정
         return super.init({ // 테이블 컬럼에 대한 설정
+            name: {
+                type: Sequelize.STRING(20)
+            },
+            position: {
+                type: Sequelize.STRING(20)
+            },
             email: {
                 type: Sequelize.STRING(50)
             },
-            username: {
-                type: Sequelize.STRING(15)
+            github: {
+                type: Sequelize.STRING(100)
             },
-            password: {
-                type: Sequelize.STRING(60)
+            insta: {
+                type: Sequelize.STRING(100)
+            },
+            likelion: {
+                type: Sequelize.STRING(20)
+            },
+            phone : {
+                type: Sequelize.STRING(15)
             }
 		}, { // 테이블 자체에 대한 설정
             sequelize,
@@ -23,8 +35,5 @@ module.exports = class User extends Sequelize.Model{
         });
     }
     static associate(db){ // 다른 모델과의 관계
-        // belongsTo에서 targetKey를 설정하고, hasMany에서 sourceKey를 설정한다
-        // User의 id는 hasMany의 sourceKey이자 belongsTo의 targetKey
-        db.User.hasMany(db.Post, { foreignKey: 'writer', sourceKey: 'id'});
     }
 };

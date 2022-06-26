@@ -1,12 +1,10 @@
 import { Router } from "express";
+import { getAllUser, makeUser, getUser } from "../controller/userController";
 
 const userRouter = Router();
 
-/**
- * @swagger
- * tags:
- *   name: User
- *   description: 유저 관련
- */
+userRouter.get("/", getAllUser);
+userRouter.get("/:name", getUser);
+userRouter.post("/", makeUser);
 
 export default userRouter;
