@@ -9,7 +9,7 @@ module.exports = class User extends Sequelize.Model{
                 unique: true
             },
             email: {
-                type: Sequelize.STRING(20),
+                type: Sequelize.STRING(50),
                 allowNull: false,
                 unique: true
             },
@@ -28,5 +28,6 @@ module.exports = class User extends Sequelize.Model{
         });
     }
     static associate(db){
+        db.User.hasMany(db.Post, {foreignKey: 'writer', sourceKey: 'name'});
     }
 };

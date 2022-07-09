@@ -10,6 +10,10 @@ module.exports = class Post extends Sequelize.Model{
             content: {
                 type: Sequelize.STRING(100),
                 allowNull: false
+            },
+            writer: {
+                type: Sequelize.STRING(20),
+                allowNull: false
             }
 		}, {
             sequelize,
@@ -22,5 +26,6 @@ module.exports = class Post extends Sequelize.Model{
         });
     }
     static associate(db){
+        db.Post.belongsTo(db.User, {foreignKey: 'writer', targetKey: 'name'});
     }
 };
